@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Games</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1>Games</h1>
+  </header>
+
+  <main>
+    <p id="status" class="status" hidden></p>
+    <ul id="grid" class="grid"></ul>
+  </main>
+
+  <script>
+    const grid = document.getElementById('grid');
+    const status = document.getElementById('status');
+
+    function showStatus(text) {
+      status.textContent = text;
+      status.hidden = false;
+    }
+
+    function makeCard(game) {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href = game.url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+
+      const thumb = document.createElement('div');
+      thumb.className = 'thumb';
+
+      const img = document.createElement('img');
+      img.alt = '';
+      img.loading = 'lazy';
+      img.src = `games/${encodeURIComponent(game.slug)}/thumbnail.png`;
+      // Missing thumbnail: drop the <img> so the placeholder shows through.
+      img.onerror = () => img.remove();
+      thumb.append(img);
+
+      const title = document.createElement('span');
+      title.className = 'title';
+      title.textContent = game.title;
+
+      a.append(thumb, title);
+      li.append(a);
+      return li;
+    }
+
+    fetch('games.json')
+      .then(res => {
+        if (!res.ok) throw new Error(res.status);
+        return res.json();
+      })
+      .then(games => {
+        if (!games.length) {
+          showStatus('No games yet.');
+          return;
+        }
+        grid.append(...games.map(makeCard));
+      })
+      .catch(() => showStatus('Could not load the game list.'));
+  </script>
+</body>
+</html>
