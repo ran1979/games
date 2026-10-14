@@ -3,12 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Games</title>
+  <title>Arcade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="site-header">
-    <h1>Games</h1>
+  <header class="hero">
+    <h1>Arcade</h1>
+    <p class="tagline">Pick a game and play. All games are <strong>free to play</strong> &mdash; no registration needed.</p>
   </header>
 
   <main>
@@ -36,19 +40,39 @@
       const thumb = document.createElement('div');
       thumb.className = 'thumb';
 
+      // Fallback art when there is no thumbnail: first letter of the title.
+      const fallback = document.createElement('span');
+      fallback.className = 'fallback';
+      fallback.textContent = game.title.charAt(0);
+      thumb.append(fallback);
+
       const img = document.createElement('img');
       img.alt = '';
       img.loading = 'lazy';
       img.src = `games/${encodeURIComponent(game.slug)}/thumbnail.png`;
-      // Missing thumbnail: drop the <img> so the placeholder shows through.
+      // Missing thumbnail: drop the <img> so the fallback art shows through.
       img.onerror = () => img.remove();
       thumb.append(img);
+
+      const play = document.createElement('span');
+      play.className = 'play';
+      play.setAttribute('aria-hidden', 'true');
+      play.textContent = '▶';
+      thumb.append(play);
+
+      const info = document.createElement('div');
+      info.className = 'info';
 
       const title = document.createElement('span');
       title.className = 'title';
       title.textContent = game.title;
 
-      a.append(thumb, title);
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = 'Play free';
+
+      info.append(title, tag);
+      a.append(thumb, info);
       li.append(a);
       return li;
     }
@@ -60,7 +84,7 @@
       })
       .then(games => {
         if (!games.length) {
-          showStatus('No games yet.');
+          showStatus('No games yet. Check back soon!');
           return;
         }
         grid.append(...games.map(makeCard));
